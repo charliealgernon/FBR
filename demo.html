@@ -5,6 +5,9 @@
   </head>
   <body>
     <div id="fb-root"></div>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="js/jquery.mobile-1.1.0.min.js"></script>
+    
     <script>
       // Load the SDK Asynchronously
       (function(d){
@@ -19,6 +22,7 @@
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '188837307909709', // App ID
+          secret	 : '5756fa4460496fe4b1b7a35d83de476e',
           channelUrl : '//'+window.location.hostname+'/channel', // Path to your Channel File
           //channelUrl : 'https://growing-day-9394.herokuapp.com/channel',
           status     : true, // check login status
@@ -43,10 +47,31 @@
             document.getElementById('auth-loggedin').style.display = 'none';
           }
         });
+		
+		FB.getLoginStatus(function(response){
+			var uid = response.authResponse.userID;
+			var accessToken = response.authResponse.accessToken;
+			if(response.status === 'connected'){
+				alert("accessToken = " + accessToken);
+				$.getJSON('https://graph.facebook.com/search?type=checkin&access_token='+ accessToken, function(data){
+					$.each(data, function(key, val){
+						items.push('<li id="' + key + '">' + val + '</li>');
+					});
+					$('<ul/>', {
+						'class': 'my-new-list',
+						html: items.join('')
+					}).appendTo('body');
+					alert("test2");
+				});	
+			} else if( response.status === 'not_authorized'){
+			} else{
+			}	
+		});
 
         // respond to clicks on the login and logout links
         document.getElementById('auth-loginlink').addEventListener('click', function(){
-          FB.login();
+          FB.login(function(response){
+          }, { scope: 'user_likes,user_checkins,friends_checkins,friends_likes'} );
         });
         document.getElementById('auth-logoutlink').addEventListener('click', function(){
           FB.logout();
@@ -62,7 +87,9 @@
         <div id="auth-loggedin" style="display:none">
           Hi, <span id="auth-displayname"></span>  
         (<a href="#" id="auth-logoutlink">logout</a>)
-      </div>
+        	<div id="allCheckIns" style="display:none">test</div>
+      	</div>
+      
     </div>
 
   </body>
