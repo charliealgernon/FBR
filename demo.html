@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Facebook Client-side Authentication Example</title>
+    <link rel="stylesheet" href="css/jquery.mobile-1.1.0.min.css" />
   </head>
   <body>
     <div id="fb-root"></div>
@@ -52,26 +53,33 @@
 			var uid = response.authResponse.userID;
 			var accessToken = response.authResponse.accessToken;
 			if(response.status === 'connected'){
-				alert("accessToken = " + accessToken);
-				$.getJSON('https://graph.facebook.com/search?type=checkin&access_token='+ accessToken, function(data){
-					$.each(data, function(key, val){
-						items.push('<li id="' + key + '">' + val + '</li>');
+				//console.log("accessToken = " + accessToken);
+				var html = "<ul>";
+				$.getJSON('https://graph.facebook.com/search?type=checkin&access_token='+ accessToken, function(json){
+					$.each(json.data, function(i,fb){
+						//html += "<li>" + $('<div>').html(fb.message).text() + "</li>";
+						html += "<li>" + fb.from.name + "@" + fb.place.name + "</li>";
+						console.log("each" + fb.from.name);
 					});
-					$('<ul/>', {
-						'class': 'my-new-list',
-						html: items.join('')
-					}).appendTo('body');
-					alert("test2");
+					html += "</ul>";
+					//A little animation once fetched
+					$('.facebookfeed').animate({opacity:0}, 500, function(){
+						$('.facebookfeed').html(html);
+					});
+					$('.facebookfeed').animate({opacity:1}, 500);
+					console.log(html);
 				});	
 			} else if( response.status === 'not_authorized'){
+				console.log("Not Authorized");
 			} else{
+				console.log("else");
 			}	
 		});
 
         // respond to clicks on the login and logout links
         document.getElementById('auth-loginlink').addEventListener('click', function(){
           FB.login(function(response){
-          }, { scope: 'user_likes,user_checkins,friends_checkins,friends_likes'} );
+          }, { scope: 'user_status, friends_status, user_likes, friends_likes,'} );
         });
         document.getElementById('auth-logoutlink').addEventListener('click', function(){
           FB.logout();
@@ -79,15 +87,21 @@
       } 
     </script>
 
-    <h1>Facebook Client-side Authentication Example</h1>
-      <div id="auth-status">
+    <h1>Show All Check-ins</h1>
+    <div data-role="page" class="type-interior">
+		<div data-role="header" data-theme="f">
+		<h1>Show All Check-ins</h1>
+		<a href="demo.html" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
+		<a href="../nav.html" data-icon="search" data-iconpos="notext" data-rel="dialog" data-transition="fade">Search</a>
+	</div>
+	
+      <div class="facebookfeed">Loading...</div>
+      <div id="auth-status" data-role="footer" class="footer-docs" data-theme="c">
         <div id="auth-loggedout">
           <a href="#" id="auth-loginlink">Login</a>
         </div>
         <div id="auth-loggedin" style="display:none">
-          Hi, <span id="auth-displayname"></span>  
-        (<a href="#" id="auth-logoutlink">logout</a>)
-        	<div id="allCheckIns" style="display:none">test</div>
+          Hi, <span id="auth-displayname"></span>  (<a href="#" id="auth-logoutlink">logout</a>)
       	</div>
       
     </div>
