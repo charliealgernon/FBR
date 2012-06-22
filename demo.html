@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
+  	<meta charset="utf-8">
     <title>Facebook Client-side Authentication Example</title>
-    <link rel="stylesheet" href="css/jquery.mobile-1.1.0.min.css" />
+    <link rel="stylesheet" href="css/jquery.mobile-1.1.0.css" />
+    <link rel="stylesheet" href="css/jqm-docs.css" />
+    
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="js/jqm-docs.js"></script>
+    <script src="js/jquery.mobile-1.1.0.js"></script>
   </head>
   <body>
     <div id="fb-root"></div>
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script src="js/jquery.mobile-1.1.0.min.js"></script>
-    
     <script>
       // Load the SDK Asynchronously
       (function(d){
@@ -54,19 +57,21 @@
 			var accessToken = response.authResponse.accessToken;
 			if(response.status === 'connected'){
 				//console.log("accessToken = " + accessToken);
-				var html = "<ul>";
+				//var html = "<ul data-role='listview' data-inset='true' data-theme='d'>";
+				var html = "";
+				//html += "<li data-role='list-divider>View All</li>";
 				$.getJSON('https://graph.facebook.com/search?type=checkin&access_token='+ accessToken, function(json){
 					$.each(json.data, function(i,fb){
 						//html += "<li>" + $('<div>').html(fb.message).text() + "</li>";
-						html += "<li>" + fb.from.name + "@" + fb.place.name + "</li>";
+						html += "<li data-icon='info'><a href='index.html'>" + fb.from.name + "@" + fb.place.name + "</a></li>";
 						console.log("each" + fb.from.name);
 					});
-					html += "</ul>";
+					//html += "</ul>";
 					//A little animation once fetched
-					$('.facebookfeed').animate({opacity:0}, 500, function(){
-						$('.facebookfeed').html(html);
-					});
-					$('.facebookfeed').animate({opacity:1}, 500);
+					//$('#facebookfeed').animate({opacity:0}, 500, function(){
+						$('#facebookfeed').html(html);
+					//});
+					//$('#facebookfeed').animate({opacity:1}, 500);
 					console.log(html);
 				});	
 			} else if( response.status === 'not_authorized'){
@@ -87,15 +92,36 @@
       } 
     </script>
 
-    <h1>Show All Check-ins</h1>
     <div data-role="page" class="type-interior">
-		<div data-role="header" data-theme="f">
+		<div data-role="header" data-theme="b">
 		<h1>Show All Check-ins</h1>
 		<a href="demo.html" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
 		<a href="../nav.html" data-icon="search" data-iconpos="notext" data-rel="dialog" data-transition="fade">Search</a>
 	</div>
-	
-      <div class="facebookfeed">Loading...</div>
+	<div data-role="content">
+		<div class="content-primary">
+			<ul data-role="listview">
+				<li>
+					<h3>A</h3>
+					<p>detail</p>
+					<ul>
+						<li>a-a
+							<ul id="facebookfeed">
+								<li>a-a detail</li>
+							</ul>
+						</li>
+					</ul>
+					<!--<ul id="facebookfeed">
+		      		Loading...
+		     		</ul>-->
+				</li>
+				<li>
+					<h3>B</h3>
+					<p>detail</p>
+				</li>
+			</ul>
+		</div>
+	</div>
       <div id="auth-status" data-role="footer" class="footer-docs" data-theme="c">
         <div id="auth-loggedout">
           <a href="#" id="auth-loginlink">Login</a>
